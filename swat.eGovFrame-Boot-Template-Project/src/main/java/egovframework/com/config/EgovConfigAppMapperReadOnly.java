@@ -12,12 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
 
 /**
  * @ClassName : EgovConfigAppMapper.java
@@ -38,9 +36,9 @@ import org.springframework.jdbc.support.lob.DefaultLobHandler;
  */
 @Configuration
 @PropertySources({ @PropertySource("classpath:/application.properties") })
-public class EgovConfigAppMapper {
+public class EgovConfigAppMapperReadOnly {
 	@Autowired
-	@Qualifier("lazyConnectionDataSource")
+	@Qualifier("dataSourceReadOnly")
 	DataSource dataSource;
 
 	@Autowired
@@ -53,13 +51,13 @@ public class EgovConfigAppMapper {
 		dbType = env.getProperty("Globals.DbType");
 	}
 
-	@Bean
-	@Lazy
-	DefaultLobHandler lobHandler() {
-		return new DefaultLobHandler();
-	}
+//	@Bean
+//	@Lazy
+//	public DefaultLobHandler lobHandler() {
+//		return new DefaultLobHandler();
+//	}
 
-	@Bean(name = { "sqlSession", "egov.sqlSession" })
+	@Bean(name = { "sqlSessionReadOnly" })
 	SqlSessionFactoryBean sqlSession() throws IOException {
 		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
 		sqlSessionFactoryBean.setDataSource(dataSource);
@@ -76,7 +74,7 @@ public class EgovConfigAppMapper {
 	}
 
 	@Bean
-	SqlSessionTemplate egovSqlSessionTemplate(@Qualifier("sqlSession") SqlSessionFactory sqlSession) {
+	SqlSessionTemplate egovSqlSessionTemplateReadOnly(@Qualifier("sqlSessionReadOnly") SqlSessionFactory sqlSession) {
 		SqlSessionTemplate sqlSessionTemplate = new SqlSessionTemplate(sqlSession);
 		return sqlSessionTemplate;
 	}
